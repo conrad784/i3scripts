@@ -1,0 +1,31 @@
+#!/usr/bin/zsh
+
+if [ "$1" = "" ]; then
+	choice=$(echo "0: german (Neo2)
+1: german (nodeadkeys)
+2: us (international)" | dmenu -b -nb '#222222' -nf '#888888' -sb '#285577' -sf '#ffffff' -p 'keyboard layout:')
+else
+	choice=$1
+fi
+
+case $choice in
+	0*)
+	echo "german (Neo2)"
+	setxkbmap de neo
+	;;
+
+	1*)
+	echo "german (nodeadkeys)"
+	setxkbmap de nodeadkeys
+	;;
+
+	2*)
+	echo "us (international)"
+	setxkbmap us intl
+	;;
+
+	*)
+	echo "invalid choice"
+	exit 1
+	;;
+esac
