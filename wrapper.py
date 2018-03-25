@@ -28,8 +28,10 @@ def get_keymap():
     """ Get the currently used keymap. """
     import subprocess
     cmd = ["setxkbmap", "-query"]
-    o = subprocess.check_output(cmd)
-    lg = o.decode().split()[5]
+    out = subprocess.check_output(cmd).decode()
+    o = out.split()
+    odict = {o[i][:-1]: o[i+1] for i in range(0, len(o), 2)}
+    lg = odict.get("variant") or odict.get("layout")
     if lg == "de":
         color = color_ok
     else:
