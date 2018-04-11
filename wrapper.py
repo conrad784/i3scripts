@@ -54,7 +54,7 @@ def get_net_speed():
     up = (tx - last_tx) / interval
     #sys.stderr.write("rx: {}, tx: {}, interval: {}, down: {}, up: {}\n".format(rx, tx, interval, down, up))
     if interval > 0: # safety measure
-        rate="{}↓ {}↑".format(make_net_readable(down), make_net_readable(up))
+        rate="{}↓ {}↑".format(make_io_speed_readable(down), make_io_speed_readable(up))
     else:
         rate = ""
 
@@ -64,8 +64,36 @@ def get_net_speed():
     last_time = now
     return rate
 
-def make_net_readable(inp, unit='bytes'):
-    if unit != 'bytes':
+last_read_counter = 0
+last_write_counter = 0
+last_time_io = 0
+def get_io_speed():
+    """ Get the current write/read-rate on disks. """
+    import psutil, time
+    global last_time_io, last_read_counter, last_write_counter
+    read, write = psutil.disk_io_counters()[2:4]
+
+    now = time.time()
+    interval = now - last_time_io
+
+    read_rate = (read - last_read_counter) / interval
+    write_rate = (write - last_write_counter) / interval
+    sys.stderr.write("write: {}, read: {}, interval: {}, read_rate: {}, write_rate: {}\n".format(write, read, interval, read_rate, write_rate))
+
+    if interval > 0: # safety measure
+        rate="w:{} r:{}".format(make_io_speed_readable(write_rate),make_io_speed_readable(read_rate))
+    else:
+        rate = ""
+
+    # set the last_* variables
+    last_write_counter = write
+    last_read_counter = read
+    last_time_io = now
+    return rate
+
+
+def make_io_speed_readable(inp, input_unit='bytes'):
+    if input_unit != 'bytes':
         raise NotImplemented
     lbytes = int(inp)
     kib = lbytes >> 10
@@ -117,6 +145,7 @@ if __name__ == '__main__':
         j.insert(-1, {'full_text' : '{}'.format(keymap),
                      'color' : '{}'.format(keymap_color),
                      'name' : 'gov'})
-        j.insert(0, {'full_text' : '{}'.format(get_net_speed()), 'name' : 'gov'})
+        j.insert(0, {'full_text' : '{}'.format(get_net_speed()), 'name' : 'net_speed'})
+        j.insert(0, {'full_text' : '{}'.format(get_io_speed()), 'name' : 'io'})
         # and echo back new encoded json
         print_line(prefix+json.dumps(j))
