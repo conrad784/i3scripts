@@ -54,7 +54,7 @@ def get_net_speed():
     up = (tx - last_tx) / interval
     #sys.stderr.write("rx: {}, tx: {}, interval: {}, down: {}, up: {}\n".format(rx, tx, interval, down, up))
     if interval > 0: # safety measure
-        rate="{}↓ {}↑".format(make_human_readable(down), make_human_readable(up))
+        rate="{}↓ {}↑".format(make_human_readable(down, '', True), make_human_readable(up, '', True))
     else:
         rate = ""
 
@@ -104,7 +104,7 @@ class Rate(object):
 
     def __call__(self, val, input_unit='bytes'):
         self.val = val
-        return "{}:{}".format(self.indicator, make_human_readable(val))
+        return "{}:{}".format(self.indicator, make_human_readable(val, '', True))
 
     @property
     def indicator(self):
@@ -114,17 +114,14 @@ class Rate(object):
             return self.indicators[0]
 
 
-def make_human_readable(inp, input_unit='bytes'):
-    if input_unit != 'bytes':
-        raise NotImplemented
-    lbytes = int(inp)
-    kib = lbytes >> 10
-    if kib < 0:
-        return "? K"
-    elif kib > 1024:
-        return "{number:.{digits}f} M".format(number=(kib / 1024), digits=2)
-    else:
-        return "{} K".format(kib)
+def make_human_readable(num, suffix='B', suppress_low=False, decimals=2):
+    if suppress_low and abs(num) < 1024:
+        return "{} K".format(int(num) >> 10)
+    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+        if abs(num) < 1024.0:
+            return "{number:.{digits}f}{unit}{suffix}".format(number=num, digits=decimals, unit=unit, suffix=suffix)
+        num /= 1024.0
+    return "{number:.1f}{unit}{suffix}".format(number=num, unit='Yi', suffix=suffix)
 
 ########  output functions ########
 def print_line(message):
