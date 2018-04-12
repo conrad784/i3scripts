@@ -93,6 +93,10 @@ def get_io_speed():
     last_time_io = now
     return rate
 
+def get_disk_free(partition = "/"):
+    import psutil
+    return make_human_readable(psutil.disk_usage(partition)[2], decimals=1)
+
 ####### output formatting functions #######
 class Rate(object):
     """"
