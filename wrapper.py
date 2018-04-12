@@ -159,16 +159,20 @@ if __name__ == '__main__':
         # ignore comma at start of lines
         if line.startswith(','):
             line, prefix = line[1:], ','
-
         j = json.loads(line)
         # insert information into the start of the json, but could be anywhere
         # CHANGE THIS LINE TO INSERT SOMETHING ELSE
         #j.insert(0, {'full_text' : '{}'.format(get_governor()), 'name' : 'gov'})
+
+        # append to the right
         keymap, keymap_color = get_keymap()
         j.insert(-1, {'full_text' : '{}'.format(keymap),
                      'color' : '{}'.format(keymap_color),
                      'name' : 'gov'})
+
+        # append to the left
+        j.insert(0, {'full_text' : '{} ⛁{}'.format(get_io_speed(), get_disk_free()), 'name' : 'disk'})
         j.insert(0, {'full_text' : '{}'.format(get_net_speed()), 'name' : 'net_speed'})
-        j.insert(0, {'full_text' : '{}'.format(get_io_speed()), 'name' : 'io'})
         # and echo back new encoded json
+        #sys.stderr.write("\n[DEBUG] full_j: {}\n\n".format(j))
         print_line(prefix+json.dumps(j))
