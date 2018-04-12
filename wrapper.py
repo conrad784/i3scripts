@@ -54,7 +54,7 @@ def get_net_speed():
     up = (tx - last_tx) / interval
     #sys.stderr.write("rx: {}, tx: {}, interval: {}, down: {}, up: {}\n".format(rx, tx, interval, down, up))
     if interval > 0: # safety measure
-        rate="{}↓ {}↑".format(make_io_speed_readable(down), make_io_speed_readable(up))
+        rate="{}↓ {}↑".format(make_human_readable(down), make_human_readable(up))
     else:
         rate = ""
 
@@ -78,10 +78,12 @@ def get_io_speed():
 
     read_rate = (read - last_read_counter) / interval
     write_rate = (write - last_write_counter) / interval
-    sys.stderr.write("write: {}, read: {}, interval: {}, read_rate: {}, write_rate: {}\n".format(write, read, interval, read_rate, write_rate))
+    #sys.stderr.write("write: {}, read: {}, interval: {}, read_rate: {}, write_rate: {}\n".format(write, read, interval, read_rate, write_rate))
 
+    r_write = Rate(('△','▲'))
+    r_read =  Rate(('▽','▼'))
     if interval > 0: # safety measure
-        rate="w:{} r:{}".format(make_io_speed_readable(write_rate),make_io_speed_readable(read_rate))
+        rate="{} {}".format(r_write(write_rate), r_read(read_rate))
     else:
         rate = ""
 
@@ -91,8 +93,28 @@ def get_io_speed():
     last_time_io = now
     return rate
 
+####### output formatting functions #######
+class Rate(object):
+    """"
+    parameter 'indicators' evaluates takes first as empty and  last as filled indicator
+    working examples: Rate(indicators = ('▽','▼')) or Rate(indicators = ('↑'))
+    """
+    def __init__(self, indicators):
+        self.indicators = indicators
 
-def make_io_speed_readable(inp, input_unit='bytes'):
+    def __call__(self, val, input_unit='bytes'):
+        self.val = val
+        return "{}:{}".format(self.indicator, make_human_readable(val))
+
+    @property
+    def indicator(self):
+        if self.val:
+            return self.indicators[-1]
+        else:
+            return self.indicators[0]
+
+
+def make_human_readable(inp, input_unit='bytes'):
     if input_unit != 'bytes':
         raise NotImplemented
     lbytes = int(inp)
