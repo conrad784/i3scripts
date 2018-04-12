@@ -67,10 +67,11 @@ def get_net_speed():
 last_read_counter = 0
 last_write_counter = 0
 last_time_io = 0
+consecutive_io = 0
 def get_io_speed():
     """ Get the current write/read-rate on disks. """
     import psutil, time
-    global last_time_io, last_read_counter, last_write_counter
+    global last_time_io, last_read_counter, last_write_counter, consecutive_io
     read, write = psutil.disk_io_counters()[2:4]
 
     now = time.time()
@@ -78,14 +79,17 @@ def get_io_speed():
 
     read_rate = (read - last_read_counter) / interval
     write_rate = (write - last_write_counter) / interval
-    #sys.stderr.write("write: {}, read: {}, interval: {}, read_rate: {}, write_rate: {}\n".format(write, read, interval, read_rate, write_rate))
+    #sys.stderr.write("\nwrite: {}, read: {}, interval: {}, read_rate: {}, write_rate: {}\n".format(write, read, interval, read_rate, write_rate))
 
+    if read_rate or write_rate:
+        consecutive_io += 1
     r_write = Rate(('△','▲'))
     r_read =  Rate(('▽','▼'))
-    if interval > 0: # safety measure
+    if interval > 0 and consecutive_io > 2: # safety measure
         rate="{} {}".format(r_write(write_rate), r_read(read_rate))
+        consecutive_io -= 1
     else:
-        rate = ""
+        rate = "{} {}".format(r_write(0), r_read(0))
 
     # set the last_* variables
     last_write_counter = write
