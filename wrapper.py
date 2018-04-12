@@ -123,7 +123,7 @@ def make_human_readable(num, suffix='B', suppress_low=False, decimals=2):
         return "{} K".format(int(num) >> 10)
     for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
         if abs(num) < 1024.0:
-            return "{number:.{digits}f}{unit}{suffix}".format(number=num, digits=decimals, unit=unit, suffix=suffix)
+            return "{number:.{digits}f} {unit}{suffix}".format(number=num, digits=decimals, unit=unit, suffix=suffix)
         num /= 1024.0
     return "{number:.1f}{unit}{suffix}".format(number=num, unit='Yi', suffix=suffix)
 
