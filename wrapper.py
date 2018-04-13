@@ -38,30 +38,43 @@ def get_keymap():
         color = color_degraded
     return lg, color
 
-last_rx = 0
-last_tx = 0
+last_rx = {}
+last_tx = {}
 last_time = 0
-def get_net_speed():
+def get_net_speed(aggregated=False, ignore_iface=["lo", "virbr0", "virbr0-nic"]):
     """ Get the current net speed. """
     import psutil, time
     global last_time, last_rx, last_tx
-    tx, rx = psutil.net_io_counters()[:2]
 
+    traffic = psutil.net_io_counters(pernic=True)
     now = time.time()
     interval = now - last_time
+    rate_max = {"iface": None, "down": 0, "up": 0}
+    rate_aggregated = {"iface": "C", "down": 0, "up": 0}
+    for iface, counters in traffic.items():
+        if iface in ignore_iface:
+            continue
+        tx, rx = counters[:2]
 
-    down = (rx - last_rx) / interval
-    up = (tx - last_tx) / interval
-    #sys.stderr.write("rx: {}, tx: {}, interval: {}, down: {}, up: {}\n".format(rx, tx, interval, down, up))
-    if interval > 0: # safety measure
-        rate="{}↓ {}↑".format(make_human_readable(down, '', True), make_human_readable(up, '', True))
-    else:
-        rate = ""
+        down = (rx - last_rx.get(iface, rx)) / interval
+        up = (tx - last_tx.get(iface, tx)) / interval
+        #sys.stderr.write("\niface: {}, rx: {}, tx: {}, interval: {}, down: {}, up: {}\n".format(iface, rx, tx, interval, down, up))
 
-    # set the last_* variables
-    last_rx = rx
-    last_tx = tx
-    last_time = now
+        # set the last_* variables
+        last_rx[iface] = rx
+        last_tx[iface] = tx
+        last_time = now
+
+        rate_aggregated["down"] += down
+        rate_aggregated["up"] += up
+        if down+up > rate_max["down"]+rate_max["up"]:
+            rate_max.update({"iface": iface, "down": down, "up": up})
+
+    if aggregated:
+        rate_max = rate_aggregated
+    rate="{[0]}:{}↓ {}↑".format(str(rate_max["iface"]).capitalize(),
+                                make_human_readable(rate_max["down"], '', True),
+                                make_human_readable(rate_max["up"], '', True))
     return rate
 
 last_read_counter = 0
