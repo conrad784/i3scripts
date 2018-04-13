@@ -51,6 +51,8 @@ def get_net_speed(aggregated=False, ignore_iface=["lo", "virbr0", "virbr0-nic"])
     interval = now - last_time
     rate_max = {"iface": None, "down": 0, "up": 0}
     rate_aggregated = {"iface": "C", "down": 0, "up": 0}
+    r_up = Rate(('↑'), append_indicator=True)
+    r_down = Rate(('↓'), append_indicator=True)
     for iface, counters in traffic.items():
         if iface in ignore_iface:
             continue
@@ -72,9 +74,9 @@ def get_net_speed(aggregated=False, ignore_iface=["lo", "virbr0", "virbr0-nic"])
 
     if aggregated:
         rate_max = rate_aggregated
-    rate="{[0]}:{}↓ {}↑".format(str(rate_max["iface"]).capitalize(),
-                                make_human_readable(rate_max["down"], '', True),
-                                make_human_readable(rate_max["up"], '', True))
+    rate="{[0]}:{} {}".format(str(rate_max["iface"]).capitalize(),
+                                r_down(rate_max["down"]),
+                                r_up(rate_max["up"]))
     return rate
 
 last_read_counter = 0
@@ -120,12 +122,19 @@ class Rate(object):
     parameter 'indicators' evaluates takes first as empty and  last as filled indicator
     working examples: Rate(indicators = ('▽','▼')) or Rate(indicators = ('↑'))
     """
-    def __init__(self, indicators):
+    def __init__(self, indicators=(''), append_indicator=False):
         self.indicators = indicators
+        self.append_indicator = append_indicator
 
-    def __call__(self, val, input_unit='bytes'):
+    def __call__(self, val, human=True, input_unit='bytes'):
         self.val = val
-        return "{}:{}".format(self.indicator, make_human_readable(val, '', True))
+        if human:
+            ret = make_human_readable(val, '', True)
+        ret_t = (self.indicator, ret)
+        if self.append_indicator:
+            return "{}{}".format(*ret_t[::-1])
+        else:
+            return "{}:{}".format(*ret_t)
 
     @property
     def indicator(self):
