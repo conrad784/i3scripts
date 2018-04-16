@@ -116,6 +116,32 @@ def get_disk_free(partition = "/"):
     import psutil
     return make_human_readable(psutil.disk_usage(partition)[2], decimals=1)
 
+import gi
+gi.require_version('Playerctl', '1.0')
+from gi.repository import Playerctl, GLib
+def get_player_status(show_track=False):
+    player = Playerctl.Player()
+    try:
+        status = player.get_property('status')
+        track = player.get_title()
+        artist = player.get_artist()
+    except GLib.Error:
+        # player might not be running
+        return ""
+
+    # Fortmat output
+    playing = ""
+    if status.startswith("Playing"):
+        playing = "▶"
+    elif status.startswith("Paused"):
+        playing = "\u23F8"  # paused
+    elif status.startswith("Stopped"):
+        playing = "" #"\u23F9" # stop
+
+    if show_track and status.startswith("Playing"):
+        playing = f"{playing} {artist[:10]}-{track[:30]}"
+    return playing
+
 ####### output formatting functions #######
 class Rate(object):
     """"
@@ -192,7 +218,8 @@ if __name__ == '__main__':
 
         # append to the right
         keymap, keymap_color = get_keymap()
-        j.insert(-1, {'full_text' : '{}'.format(keymap),
+        j.insert(-1, {'full_text': '{}'.format(get_player_status(show_track=True)), 'name': 'player'})
+        j.insert(-1, {'full_text': '{}'.format(keymap),
                      'color' : '{}'.format(keymap_color),
                      'name' : 'gov'})
 
