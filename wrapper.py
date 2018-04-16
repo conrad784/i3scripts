@@ -138,8 +138,10 @@ def get_player_status(show_track=False):
     elif status.startswith("Stopped"):
         playing = "" #"\u23F9" # stop
 
+    if artist:
+        artist = f"{artist[:10]}-"
     if show_track and status.startswith("Playing"):
-        playing = f"{playing} {artist[:10]}-{track[:30]}"
+        playing = f"{playing} {artist}{track[:30]}"
     return playing
 
 ####### output formatting functions #######
