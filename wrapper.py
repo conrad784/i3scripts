@@ -131,15 +131,19 @@ def get_player_status(show_track=False):
 
     # Fortmat output
     playing = ""
-    if status.startswith("Playing"):
-        playing = "▶"
-    elif status.startswith("Paused"):
-        playing = "\u23F8"  # paused
-    elif status.startswith("Stopped"):
-        playing = "" #"\u23F9" # stop
+    if status:
+        if status.startswith("Playing"):
+            playing = "▶"
+        elif status.startswith("Paused"):
+            playing = ""  # paused
+        elif status.startswith("Stopped"):
+            playing = "" #"\u23F9" # stop
+    else:
+        return ""
 
     if artist:
         artist = f"{artist[:10]}-"
+    track = track.split(" - ")[0] # remove stuff like '- Radio Edit' aka make it short!
     if show_track and status.startswith("Playing"):
         playing = f"{playing} {artist}{track[:30]}"
     return playing
