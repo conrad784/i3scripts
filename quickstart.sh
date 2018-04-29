@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROGRAMS=( evolution telegram-desktop signal-desktop rambox )
+PROGRAMS=( evolution telegram-desktop signal-desktop rambox spotify )
 
 for p in "${PROGRAMS[@]}"
 do
