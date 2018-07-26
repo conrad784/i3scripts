@@ -125,9 +125,17 @@ def get_player_status(show_track=False):
         status = player.get_property('status')
         track = player.get_title()
         artist = player.get_artist()
+        metadata = player.get_property('metadata')
     except GLib.Error:
         # player might not be running
         return ""
+    try:
+        # try extracting some data from metadata attribute
+        metadata = metadata.unpack()
+        if not track:
+            track = metadata.get("xesam:url").split("/")[-1]
+    except AttributeError:
+        pass
 
     # Fortmat output
     playing = ""
