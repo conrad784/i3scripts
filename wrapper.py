@@ -238,7 +238,10 @@ if __name__ == '__main__':
                      'name' : 'gov'})
 
         # append to the left
-        j.insert(0, {'full_text' : '{} ⛁{}'.format(get_io_speed(), get_disk_free()), 'name' : 'disk'})
+        try:
+            j.insert(0, {'full_text' : '{} ⛁{}'.format(get_io_speed(), get_disk_free()), 'name' : 'disk'})
+        except ValueError:
+            j.insert(0, {'full_text': 'noDiskInfo'})
         j.insert(0, {'full_text' : '{}'.format(get_net_speed()), 'name' : 'net_speed'})
         # and echo back new encoded json
         #sys.stderr.write("\n[DEBUG] full_j: {}\n\n".format(j))
