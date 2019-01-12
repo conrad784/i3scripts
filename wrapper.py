@@ -11,6 +11,7 @@
 
 import sys
 import json
+import re
 
 ### define some default colors
 color_ok = "#FFFFFF" # white
@@ -151,7 +152,7 @@ def get_player_status(show_track=False):
 
     if artist:
         artist = f"{artist[:10]}-"
-    track = track.split(" - ")[0] # remove stuff like '- Radio Edit' aka make it short!
+    track = re.split(" -| \\(", track)[0]  # remove stuff like '- Radio Edit' aka make it short!
     if show_track and status.startswith("Playing"):
         playing = f"{playing} {artist}{track[:20]}"
     return playing
