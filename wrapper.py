@@ -153,7 +153,7 @@ def get_player_status(show_track=False):
         artist = f"{artist[:10]}-"
     track = track.split(" - ")[0] # remove stuff like '- Radio Edit' aka make it short!
     if show_track and status.startswith("Playing"):
-        playing = f"{playing} {artist}{track[:30]}"
+        playing = f"{playing} {artist}{track[:20]}"
     return playing
 
 ####### output formatting functions #######
