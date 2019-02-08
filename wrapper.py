@@ -135,6 +135,19 @@ def get_player_status(show_track=False):
         metadata = metadata.unpack()
         if not track:
             track = metadata.get("xesam:url").split("/")[-1]
+        # get information from vlc
+        try:
+            vlctitle = metadata['vlc:nowplaying']
+            try:
+                vlcartist, realtitle = vlctitle.split(" - ", 1)
+                artist = vlcartist
+                track = realtitle
+            except ValueError:
+                if vlctitle:
+                    track = vlctitle
+        except KeyError:
+            # no further information available from vlc
+            pass
     except AttributeError:
         pass
 
