@@ -118,19 +118,27 @@ def get_disk_free(partition = "/"):
     return make_human_readable(psutil.disk_usage(partition)[2], decimals=1)
 
 import gi
-gi.require_version('Playerctl', '1.0')
+gi.require_version('Playerctl', '2.0')
 from gi.repository import Playerctl, GLib
 def get_player_status(show_track=False):
-    player = Playerctl.Player()
+    manager = Playerctl.PlayerManager()
+    available_players = manager.props.player_names
+    if not available_players:
+        return ""
+
+    for name in available_players:
+        player = Playerctl.Player.new_from_name(name)
+        try:
+            status = player.get_property('status')
+            if status == 'Playing':
+                break
+        except GLib.Error:
+            # player might not be running
+            return ""
     try:
-        status = player.get_property('status')
         track = player.get_title()
         artist = player.get_artist()
         metadata = player.get_property('metadata')
-    except GLib.Error:
-        # player might not be running
-        return ""
-    try:
         # try extracting some data from metadata attribute
         metadata = metadata.unpack()
         if not track:
