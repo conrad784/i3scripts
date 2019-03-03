@@ -10,7 +10,7 @@ ffmpeg -f x11grab -video_size $RES -y -i $DISPLAY -i $LOCK -filter_complex "boxb
 # try to stop music with playerctl
 if test -x /usr/bin/playerctl
 then
-    playerctl pause
+    playerctl -a pause
 fi
 # call lock binary
 i3lock -i $TMPBG
