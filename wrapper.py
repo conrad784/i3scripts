@@ -145,7 +145,7 @@ def get_player_status(show_track=False):
             track = metadata.get("xesam:url").split("/")[-1]
         # get information from vlc
         try:
-            vlctitle = metadata['vlc:nowplaying']
+            vlctitle = metadata['vlc:nowplaying'].strip()
             try:
                 vlcartist, realtitle = vlctitle.split(" - ", 1)
                 artist = vlcartist
