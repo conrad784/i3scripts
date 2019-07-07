@@ -210,7 +210,7 @@ class Rate(object):
 
 def make_human_readable(num, suffix='B', suppress_low=False, decimals=2):
     if suppress_low and abs(num) < 1024:
-        return "{} K".format(int(num) >> 10)
+        return "{number:.{digits}f} K".format(number=(int(num) >> 10), digits=0)
     for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
         if abs(num) < 1024.0:
             return "{number:.{digits}f} {unit}{suffix}".format(number=num, digits=decimals, unit=unit, suffix=suffix)
