@@ -175,7 +175,10 @@ def get_player_status(show_track=False):
         artist = f"{artist[:10]}-"
     else:
         artist = ""
-    track = re.split(" -| \\(", track)[0]  # remove stuff like '- Radio Edit' aka make it short!
+    try:
+        track = re.split(" -| \\(", track)[0]  # remove stuff like '- Radio Edit' aka make it short!
+    except TypeError:
+        track = ""
     if show_track and status.startswith("Playing"):
         playing = f"{playing} {artist}{track[:20]}"
     return playing
