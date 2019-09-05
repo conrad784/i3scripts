@@ -27,10 +27,10 @@ if __name__ == '__main__':
             sys.exit(1)
 
         for workspace in workspace_mapping:
-            i3.command(f"workspace {workspace['name']}")
-            i3.command(f"move workspace to output {workspace['output']}")
-        for workspace in filter(lambda w: w['visible'], workspace_mapping):
-            i3.command(f"workspace {workspace['name']}")
+            i3.command(f"workspace {workspace.name}")
+            i3.command(f"move workspace to output {workspace.output}")
+        for workspace in filter(lambda w: w.visible, workspace_mapping):
+            i3.command(f"workspace {workspace.name}")
     else:
         showHelp()
         sys.exit(1)
