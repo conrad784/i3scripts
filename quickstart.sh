@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROGRAMS=( evolution telegram-desktop signal-desktop rambox spotify )
+PROGRAMS=( keepassxc evolution telegram-desktop signal-desktop rambox spotify slack )
 
 for p in "${PROGRAMS[@]}"
 do
