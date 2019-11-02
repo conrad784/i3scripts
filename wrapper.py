@@ -266,10 +266,12 @@ if __name__ == '__main__':
 
         # append to the left
         try:
-            j.insert(0, {'full_text' : '{} ⛁{}'.format(get_io_speed(), get_disk_free()), 'name' : 'disk'})
+            j.insert(0, {'full_text': '⛁{}'.format(get_disk_free()), 'name': 'disk_free'})
+            # j.insert(0, {'full_text': '{}'.format(get_io_speed()), 'name': 'disk_speed'})
         except ValueError:
             j.insert(0, {'full_text': 'noDiskInfo'})
-        j.insert(0, {'full_text' : '{}'.format(get_net_speed()), 'name' : 'net_speed'})
+        # j.insert(0, {'full_text' : '{}'.format(get_net_speed()), 'name' : 'net_speed'})
+
         # and echo back new encoded json
         #sys.stderr.write("\n[DEBUG] full_j: {}\n\n".format(j))
         print_line(prefix+json.dumps(j))
