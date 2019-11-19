@@ -2,8 +2,12 @@
 import i3ipc
 import sys
 import pickle
+import os
+import pwd
 
-PATH = "/home/conrad/.i3_workspace_mapping"
+# logged_in_user = os.getlogin()  # does not work for non-interactive shells
+logged_in_user = pwd.getpwuid(os.geteuid())[0]  # we think this is only one
+PATH = "/tmp/.i3_workspace_mapping_{}".format(logged_in_user)
 
 
 def showHelp():
