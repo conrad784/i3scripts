@@ -35,6 +35,17 @@ if __name__ == '__main__':
             i3.command(f"move workspace to output {workspace.output}")
         for workspace in filter(lambda w: w.visible, workspace_mapping):
             i3.command(f"workspace {workspace.name}")
+    elif sys.argv[1] == 'show':
+        try:
+            workspace_mapping = pickle.load(open(PATH, "rb"))
+            print(f"Loaded workspace from {PATH}")
+        except FileNotFoundError:
+            print("Can't find mappings in {}".format(PATH))
+            sys.exit(1)
+
+        for workspace in workspace_mapping:
+            print(f"{workspace.name} is on {workspace.output} and is visible: {workspace.visible}")
+
     else:
         showHelp()
         sys.exit(1)
