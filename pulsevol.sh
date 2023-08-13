@@ -16,16 +16,11 @@ STEP=5
 MAXVOLUME=150  # max vol in percent
 
 getDefaultSinkIndex() {
-    pacmd list-sinks | awk '/\* index:/{ print $3 }'
+    pactl list short sinks | sed -e 's,^\([0-9][0-9]*\)[^0-9].*,\1,' | head -n 1
 }
 
 getDefaultSinkVolPerc() {
-    VOLUME=$(pacmd list-sinks | sed -n '/* index/,/properties/p' | \
-	grep '^\s*volume:' | \
-	cut -d: -f4 | \
-	cut -d/ -f2 | \
-	cut -d% -f1 |  \
-	tr -d "[:space:]")
+    VOLUME=$( pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $SINK + 1 )) | tail -n 1 | sed -e 's,.* \([0-9][0-9]*\)%.*,\1,' )
 }
 
 getDefaultSinkVolPerc;
@@ -62,12 +57,12 @@ min(){
 }
 
 mute(){
-    pacmd set-sink-mute $SINK 1 > /dev/null
+    pactl set-sink-mute $SINK 1 > /dev/null
     notify-send " " -i "audio-volume-muted" -h int:value:0 -h string:synchronous:volume
 }
 
 unmute(){
-    pacmd set-sink-mute $SINK 0 > /dev/null
+    pactl set-sink-mute $SINK 0 > /dev/null
 }
 
 toggle(){
